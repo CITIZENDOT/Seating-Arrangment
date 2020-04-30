@@ -20,6 +20,8 @@ python3 main.py
 To create the Whole Seating Arrangment Folder, **WITHIN SECONDS**
 :wink::wink:
 
+⭐️Star⭐️ this repo, If you find this worthy:blush:
+
 ## Copyrights
 
 I don't have any rights on the data in the files. They are just for representation purpose. All Information in the files is completely owned by IIT Patna Auhority
