@@ -1,12 +1,11 @@
 # Exam Seating Arrangment Using Python
 
-This is a virtal environment with required packages. So You need not install them after cloning this repository.
-
-After getting into this directory, Run the folowing command to activate virtual environment.
+Install the openpyxl library from pip package.
 
 ```sh
-source bin/activate
+pip3 install openpyxl
 ```
+
 
 Observe the pattern of data in F1_exam_timetable_with_roll_numbers.csv file.
 
