@@ -2,12 +2,12 @@ import csv
 import os
 import openpyxl as op
 from openpyxl.styles import Alignment, Font
-
+ 
 f1 = open("F1_exam_timetable_with_roll_numbers.csv", "r")
 f2 = open("F2_rooms_capacity_info.csv", "r")
 r1 = csv.DictReader(f1)
 r2 = csv.DictReader(f2)
-
+ 
 main_list = [dict(row) for row in r1]
 room_limit = [dict(row) for row in r2]
 n = len(main_list)
@@ -46,10 +46,10 @@ for row in main_list:
                 li.pop()
             students_roll_list.extend(li)
             Total_Students+=len(li)
+        #students_roll_list  = list(set(students_roll_list))
         size = len(students_roll_list)
-        final = [""] * size
-
-        if len(students_roll_list)%2 == 1:   # If Total Allocation is odd
+        final = [" "] * size
+        if size%2 == 1:   # If Total Allocation is odd
             k = (size + 1)//2
             for i in range(0, size, 2):
                 final[i] = students_roll_list[i//2]
@@ -66,10 +66,10 @@ for row in main_list:
             c2 = []
             c3 = []
             c4 = []
-            pass
         else:                               # Allocation >= 4
             rem = size%4
-            size += (4-rem)
+            if rem != 0:
+                size += (4-rem)
             col_len = size//4
             c1 = [] * col_len
             c2 = [] * col_len
@@ -79,9 +79,8 @@ for row in main_list:
             c2 = final[col_len : 2*col_len]
             c3 = final[2*col_len:3*col_len]
             c4 = final[3*col_len:]
-
         # CREATING AND ADDING DETAILS TO FILE
-
+ 
         folder_path = "Output/" + "_".join(row["date"].split("/")) + "/" + row["shift"]
         if os.path.exists(folder_path) == False:
             os.makedirs(folder_path)
