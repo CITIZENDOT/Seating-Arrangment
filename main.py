@@ -2,35 +2,51 @@ import csv
 import os
 import openpyxl as op
 from openpyxl.styles import Alignment, Font
- 
+
 f1 = open("F1_exam_timetable_with_roll_numbers.csv", "r")
 f2 = open("F2_rooms_capacity_info.csv", "r")
 r1 = csv.DictReader(f1)
 r2 = csv.DictReader(f2)
- 
+COLORS = [
+    '00000000', '00FF0000', '0000FF00', '000000FF',             #0-4
+    '00FFFF00', '00FF00FF', '0000FFFF', '00000000', '00FFFFFF', #5-9
+    '00FF0000', '0000FF00', '000000FF', '00FFFF00', '00FF00FF', #10-14
+    '0000FFFF', '00800000', '00008000', '00000080', '00808000', #15-19
+    '00800080', '00008080', '00C0C0C0', '00808080', '009999FF', #20-24
+    '00993366', '00FFFFCC', '00CCFFFF', '00660066', '00FF8080', #25-29
+    '000066CC', '00CCCCFF', '00000080', '00FF00FF', '00FFFF00', #30-34
+    '0000FFFF', '00800080', '00800000', '00008080', '000000FF', #35-39
+    '0000CCFF', '00CCFFFF', '00CCFFCC', '00FFFF99', '0099CCFF', #40-44
+    '00FF99CC', '00CC99FF', '00FFCC99', '003366FF', '0033CCCC', #45-49
+    '0099CC00', '00FFCC00', '00FF9900', '00FF6600', '00666699', #50-54
+    '00969696', '00003366', '00339966', '00003300', '00333300', #55-59
+    '00993300', '00993366', '00333399', '00333333', 'System Foreground', 'System Background' #60-64
+]
 main_list = [dict(row) for row in r1]
 room_limit = [dict(row) for row in r2]
 n = len(main_list)
 check_list = [0] * n    #If this is zero, Then That row is yet to be processed. If It is not, Then Processing is Done.
 file_count = 0
 for row in main_list:
-    ind = main_list.index(row)
+    ind = main_list.index(row)  #Index of row
     if check_list[ind] != 0:
         continue
     else:
-        temp_list = []
+        temp_list = []          #Contains the required rows (Directly)
         for row1 in main_list:
             if row1["date"] == row["date"] and row1["day"] == row["day"] and row1["shift"] == row["shift"] and row1["roomno"] == row["roomno"]:
                 temp_list.append(row1)
                 check_list[main_list.index(row1)] = 1
         temp_list.sort(key=lambda data: int(data["allocationdone"]), reverse = True)
-        students = []
-        for row1 in temp_list:
+        #students = []
+        """for row1 in temp_list:
             li = []
             li = row1["rollnolist"].split(",")
+            courses.add(li[0][:6])
             if li[-1] == "":
                 li.pop()            
             students.append(li)
+        courses = list(courses)"""
         file_count += 1
         temp_list.sort(key=lambda x: int(x["allocationdone"]), reverse=True)
         for room in room_limit:
@@ -60,6 +76,10 @@ for row in main_list:
             for i in range(0, size, 2):
                 final[i] = students_roll_list[i//2]
                 final[i+1] = students_roll_list[(i//2) + k]
+        courses = set()
+        for i in range(len(final)):
+            courses.add(final[i][:6])
+        courses = list(courses)
         if size < 4:  
             col_len = size               # Allocation < 4
             c1 = final
@@ -80,7 +100,7 @@ for row in main_list:
             c3 = final[2*col_len:3*col_len]
             c4 = final[3*col_len:]
         # CREATING AND ADDING DETAILS TO FILE
- 
+
         folder_path = "Output/" + "_".join(row["date"].split("/")) + "/" + row["shift"]
         if os.path.exists(folder_path) == False:
             os.makedirs(folder_path)
@@ -125,29 +145,34 @@ for row in main_list:
             time_lower_limit = "03"
             time_upper_limit = "05"
             mer = "P"   #Meridian
-        sheet["A3"] = "Room No.102                                                          Time:   "+ time_lower_limit + ":00" + mer + "M - " + time_upper_limit + ":00" + mer + "M"
+        sheet["A3"] = "Room No." + row["roomno"] + "                                                          Time:   "+ time_lower_limit + ":00" + mer + "M - " + time_upper_limit + ":00" + mer + "M"
         sheet["A3"].font = sub_headings_font
         sheet["A3"].alignment = cell_Alignment
         # Filling Sheet START
         #Column 1
         for i in range(len(c1)):
             sheet.cell(row=i+5, column=1).value = c1[i]
-            sheet.cell(row=i+5, column=1).font = normal_cell_font
-            sheet.cell(row=i+5, column=1).alignment = cell_Alignment
+            color_index = courses.index(c1[i][:6])
+            sheet.cell(row=i+5, column=1).font = Font(name='Calibri', size=12, color=COLORS[color_index])
+            sheet.cell(row=i+5, column=1).alignment = cell_Alignment            
+
         #Column 2
         for i in range(len(c2)):
             sheet.cell(row=i+5, column=2).value = c2[i]
-            sheet.cell(row=i+5, column=2).font = normal_cell_font
+            color_index = courses.index(c2[i][:6])
+            sheet.cell(row=i+5, column=2).font = Font(name='Calibri', size=12, color=COLORS[color_index])
             sheet.cell(row=i+5, column=2).alignment = cell_Alignment
         #Column 3
         for i in range(len(c3)):
             sheet.cell(row=i+5, column=3).value = c3[i]
-            sheet.cell(row=i+5, column=3).font = normal_cell_font
+            color_index = courses.index(c3[i][:6])
+            sheet.cell(row=i+5, column=3).font = Font(name='Calibri', size=12, color=COLORS[color_index])
             sheet.cell(row=i+5, column=3).alignment = cell_Alignment
         #Column 4
         for i in range(len(c4)):
             sheet.cell(row=i+5, column=4).value = c4[i]
-            sheet.cell(row=i+5, column=4).font = normal_cell_font
+            color_index = courses.index(c4[i][:6])
+            sheet.cell(row=i+5, column=4).font = Font(name='Calibri', size=12, color=COLORS[color_index])
             sheet.cell(row=i+5, column=4).alignment = cell_Alignment
         # Filling Sheet END
         wb.save(file_path)
